@@ -1,27 +1,18 @@
-from robokassa import HashAlgorithm, Robokassa
+from exceptions import APIError
 import decimal
 from decimal import Decimal 
 import hashlib
 from urllib import parse
 from urllib.parse import urlparse
 import logging
+import requests
+from typing import Any, Dict, Optional, Union
+from constants import *
+from models import Payment, PaymentStatus, HashAlgorithm
+from utils import _calculate_signature_arg, validate_payment_parameters, calculate_signature
 
-'''
-test_key_1 = "w7uCkP2G7m3HP4jyfdzP"
-test_key_2 = "hfvx88t25kkbW8xbxUAh"
+from datetime import datetime
 
-robokassa = Robokassa(
-    merchant_login="reflow",
-    password1=test_key_1,
-    password2=test_key_2,
-    is_test=True,
-    algorithm=HashAlgorithm.md5,
-)
-
-my_link = robokassa.generate_open_payment_link(out_sum=100, inv_id=1)
-
-'''
-API_STATUS_URL = ''
 
 class RobokassaClient:
     
@@ -107,7 +98,7 @@ class RobokassaClient:
                         date_to: datetime, 
                         status: Optional[PaymentStatus] = None,
                         limit: int = 100,
-                        offset: int = 0) -> List[Payment]:
+                        offset: int = 0) -> list[Payment]:
             try:
                 resp = requests.get(
                     API_STATUS_URL,
@@ -126,6 +117,7 @@ class RobokassaClient:
                 return [Payment(**payment) for payment in data]
             except Exception as e:
                 raise APIError(f"Failed to get payments list: {e}")
+
 
 
 
