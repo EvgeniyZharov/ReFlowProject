@@ -229,6 +229,17 @@ def add_wb_size(card_id, size_name, size_sku=None, quantity=0, barcode=None):
     except Exception as e:
         print(f"Ошибка при добавлении размера: {e}")
         return None
+    
+def get_wb_sizes_by_card(card_id):
+    """Получение размеров товара по карточке"""
+    try:
+        with engine.connect() as conn:
+            query = wb_sizes.select().where(wb_sizes.c.card_id == card_id)
+            result = conn.execute(query)
+            return result.fetchall()
+    except Exception as e:
+        print(f"Ошибка при получении размеров WB: {e}")
+        return []
 
 def add_wb_image(card_id, image_url, sort_order=0):
     """Добавление изображения товара"""
@@ -246,6 +257,17 @@ def add_wb_image(card_id, image_url, sort_order=0):
     except Exception as e:
         print(f"Ошибка при добавлении изображения: {e}")
         return None
+    
+def get_wb_images_by_card(card_id):
+    """Получение изображений товара по карточке"""
+    try:
+        with engine.connect() as conn:
+            query = wb_images.select().where(wb_images.c.card_id == card_id)
+            result = conn.execute(query)
+            return result.fetchall()
+    except Exception as e:
+        print(f"Ошибка при получении изображений WB: {e}")
+        return []
 
 def add_sync_log(account_id, status, cards_processed=0, error_message=None):
     """Добавление записи в лог синхронизации"""
@@ -292,6 +314,48 @@ def update_wb_account_last_sync(account_id):
             return True
     except Exception as e:
         print(f"Ошибка при обновлении времени синхронизации: {e}")
+        return False
+
+def update_data_by_query(table_name, update_data, where_conditions):
+    try:
+        with engine.connect() as conn:
+            table_map = {
+                'api_keys': api_keys,
+                'cards': cards,
+                'wb_accounts': wb_accounts,
+                'wb_cards': wb_cards,
+                'wb_sizes': wb_sizes,
+                'wb_images': wb_images,
+                'sync_logs': sync_logs
+            }
+            
+            if table_name not in table_map:
+                print(f"❌ Таблица '{table_name}' не найдена")
+                return False
+            
+            table = table_map[table_name]
+            
+            stmt = table.update()
+            
+            for column, value in where_conditions.items():
+                if hasattr(table.c, column):
+                    stmt = stmt.where(getattr(table.c, column) == value)
+                else:
+                    print(f"❌ Колонка '{column}' не найдена в таблице '{table_name}'")
+                    return False
+            
+            # Добавляем данные для обновления
+            stmt = stmt.values(**update_data)
+            
+            # Выполняем запрос
+            result = conn.execute(stmt)
+            conn.commit()
+            
+            print(f"✅ Данные в таблице '{table_name}' обновлены. Затронуто строк: {result.rowcount}")
+            return True
+            
+    except Exception as e:
+        print(f"❌ Ошибка при обновлении данных: {e}")
         return False
 
 # Пример использования

@@ -1,0 +1,26 @@
+Карточки
+id,title,description,price
+1,Тестовая карточка 1,Описание первой тестовой карточки,999.99
+2,Тестовая карточка 2,Описание второй тестовой карточки,1499.50
+3,Премиум карточка,Карточка с повышенной ценой,2999.00
+6,Новая карточка из Python,Создана через SQLAlchemy,1999.99
+""
+API ключи
+id,title,api_key
+1,Основной ключ,test_api_key_12345
+2,Резервный ключ,backup_api_key_67890
+""
+Аккаунты WB
+id,title,api_key,account_name,company_name,is_active,created_at,last_sync
+""
+Логи синхронизации
+id,account_id,status,cards_processed,error_message,sync_date
+""
+Карточки WB
+id,account_id,nm_id,sku,imt_name,subject_name,brand_name,current_price,original_price,total_quantity,created_at,updated_at
+""
+Размеры WB
+id,card_id,size_name,size_sku,quantity,barcode
+""
+Изображения WB
+id,card_id,image_url,sort_order
